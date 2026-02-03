@@ -7,12 +7,21 @@ const CATEGORIES = [
   { value: 'accessory', label: 'Accessory', emoji: '✨' },
 ]
 
+const SEASONS = [
+  { value: 'spring', label: 'Spring', emoji: '🌸' },
+  { value: 'summer', label: 'Summer', emoji: '☀️' },
+  { value: 'fall', label: 'Fall', emoji: '🍂' },
+  { value: 'winter', label: 'Winter', emoji: '❄️' },
+]
+
 const PLACEHOLDER_IMAGE = 'https://placehold.co/400x400/e6e6fa/6b7280?text=No+Image'
 
 export default function AddItemForm({ onAdd }) {
   const [name, setName] = useState('')
   const [category, setCategory] = useState('top')
+  const [season, setSeason] = useState('')
   const [imageUrl, setImageUrl] = useState('')
+  const [removingBg, setRemovingBg] = useState(false)
   const fileInputRef = useRef(null)
 
   function handleSubmit(e) {
@@ -22,10 +31,12 @@ export default function AddItemForm({ onAdd }) {
       id: crypto.randomUUID(),
       name: name.trim(),
       category,
+      season: season || null,
       imageUrl: imageUrl.trim() || PLACEHOLDER_IMAGE,
     })
     setName('')
     setCategory('top')
+    setSeason('')
     setImageUrl('')
     if (fileInputRef.current) fileInputRef.current.value = ''
   }
@@ -37,6 +48,26 @@ export default function AddItemForm({ onAdd }) {
     reader.onload = () => setImageUrl(reader.result)
     reader.readAsDataURL(file)
   }
+
+  async function handleRemoveBackground() {
+    if (!imageUrl || !imageUrl.startsWith('data:')) return
+    setRemovingBg(true)
+    try {
+      const mod = await import('@imgly/background-removal')
+      const removeBackground = mod.default ?? mod.removeBackground
+      const blob = await removeBackground(imageUrl)
+      const reader = new FileReader()
+      reader.onload = () => setImageUrl(reader.result)
+      reader.readAsDataURL(blob)
+    } catch (err) {
+      console.error('Background removal failed:', err)
+      alert('Could not remove background. Try a different image or use the image as-is.')
+    } finally {
+      setRemovingBg(false)
+    }
+  }
+
+  const canRemoveBg = imageUrl && imageUrl.startsWith('data:') && !removingBg
 
   return (
     <form
@@ -82,6 +113,25 @@ export default function AddItemForm({ onAdd }) {
         </div>
 
         <div>
+          <label htmlFor="item-season" className="block text-sm font-medium text-gray-700 mb-1">
+            Season
+          </label>
+          <select
+            id="item-season"
+            value={season}
+            onChange={(e) => setSeason(e.target.value)}
+            className="w-full px-4 py-2.5 rounded-xl border-2 border-y2k-pink/40 focus:border-y2k-pink focus:ring-2 focus:ring-y2k-pink/30 outline-none transition bg-white"
+          >
+            <option value="">Any season</option>
+            {SEASONS.map((s) => (
+              <option key={s.value} value={s.value}>
+                {s.emoji} {s.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Image (URL or upload)
           </label>
@@ -108,6 +158,21 @@ export default function AddItemForm({ onAdd }) {
             >
               📷 Upload image
             </label>
+            {canRemoveBg && (
+              <button
+                type="button"
+                onClick={handleRemoveBackground}
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border-2 border-y2k-mint bg-y2k-mint/40 hover:bg-y2k-mint/60 transition text-sm font-medium text-gray-800"
+              >
+                ✂️ Make transparent PNG
+              </button>
+            )}
+            {removingBg && (
+              <span className="text-sm text-gray-600 flex items-center gap-2">
+                <span className="inline-block w-4 h-4 border-2 border-y2k-pink border-t-transparent rounded-full animate-spin" />
+                Removing background…
+              </span>
+            )}
             {imageUrl && (
               <button
                 type="button"

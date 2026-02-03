@@ -14,6 +14,13 @@ const CATEGORY_EMOJI = {
   accessory: '✨',
 }
 
+const SEASON_LABELS = {
+  spring: '🌸 Spring',
+  summer: '☀️ Summer',
+  fall: '🍂 Fall',
+  winter: '❄️ Winter',
+}
+
 export default function ItemCard({ item, onDragStart, onRemove, onRemoveFromCloset, isInOutfit }) {
   const [imageError, setImageError] = useState(false)
 
@@ -55,6 +62,11 @@ export default function ItemCard({ item, onDragStart, onRemove, onRemoveFromClos
         <span className="absolute top-2 right-2 px-2 py-0.5 rounded-full text-xs font-semibold bg-white/90 text-y2k-pink shadow-sm">
           {CATEGORY_EMOJI[item.category]} {CATEGORY_LABELS[item.category]}
         </span>
+        {item.season && (
+          <span className="absolute bottom-2 left-2 px-2 py-0.5 rounded-full text-xs font-medium bg-white/90 text-gray-700 shadow-sm">
+            {SEASON_LABELS[item.season] || item.season}
+          </span>
+        )}
       </div>
 
       <div className="p-4">

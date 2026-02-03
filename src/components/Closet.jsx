@@ -36,6 +36,7 @@ function saveOutfit(outfit) {
 export default function Closet() {
   const [items, setItems] = useState(() => loadItems())
   const [filter, setFilter] = useState('all')
+  const [seasonFilter, setSeasonFilter] = useState('all')
   const [outfit, setOutfit] = useState(() => loadOutfit())
   const [outfitDropActive, setOutfitDropActive] = useState(false)
 
@@ -60,9 +61,11 @@ export default function Closet() {
     })
   }, [])
 
-  const filteredItems = filter === 'all'
-    ? items
-    : items.filter((i) => i.category === filter)
+  const filteredItems = items.filter((i) => {
+    const matchCategory = filter === 'all' || i.category === filter
+    const matchSeason = seasonFilter === 'all' || i.season === seasonFilter || !i.season
+    return matchCategory && matchSeason
+  })
 
   const outfitIds = new Set(outfit.map((i) => i.id))
 
@@ -158,7 +161,12 @@ export default function Closet() {
         </section>
 
         <section className="mb-6">
-          <Filters activeFilter={filter} onFilterChange={setFilter} />
+          <Filters
+            activeFilter={filter}
+            onFilterChange={setFilter}
+            activeSeasonFilter={seasonFilter}
+            onSeasonFilterChange={setSeasonFilter}
+          />
         </section>
 
         <section>
