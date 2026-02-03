@@ -3,9 +3,30 @@
 @tailwind utilities;
 
 @layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
   body {
     @apply font-bubble antialiased;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    min-height: 100vh;
+    min-height: 100dvh;
   }
+}
+
+/* Touch-friendly: 44px min tap targets on touch devices */
+@media (pointer: coarse) {
+
+  button,
+  [role="button"],
+  .btn-y2k {
+    min-height: 44px;
+  }
+}
+
+.touch-manipulation {
+  touch-action: manipulation;
 }
 
 /* Holographic text effect */

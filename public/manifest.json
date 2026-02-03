@@ -1,0 +1,22 @@
+{
+  "name": "Y2K Closet",
+  "short_name": "Y2K Closet",
+  "description": "Your virtual wardrobe from the 2000s",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#e6e6fa",
+  "theme_color": "#ffb6c1",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "categories": [
+    "lifestyle",
+    "shopping"
+  ]
+}

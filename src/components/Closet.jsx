@@ -131,7 +131,7 @@ export default function Closet() {
             onDragLeave={handleOutfitDragLeave}
             className={`
               min-h-[140px] rounded-3xl border-2 border-dashed border-y2k-pink/60
-              bg-white/40 backdrop-blur-sm p-6 transition-all duration-200
+              bg-white/40 backdrop-blur-sm p-4 sm:p-6 transition-all duration-200 touch-manipulation
               ${outfitDropActive ? 'drag-over' : ''}
             `}
           >
