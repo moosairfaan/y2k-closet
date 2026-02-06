@@ -108,10 +108,42 @@ export default function Closet() {
     }
   }, [])
 
+  const outfitDropZone = (
+    <div
+      onDrop={handleOutfitDrop}
+      onDragOver={handleOutfitDragOver}
+      onDragLeave={handleOutfitDragLeave}
+      className={`
+        min-h-[120px] sm:min-h-[140px] rounded-3xl border-2 border-dashed border-y2k-pink/60
+        bg-white/40 backdrop-blur-sm p-4 sm:p-6 transition-all duration-200 touch-manipulation
+        ${outfitDropActive ? 'drag-over' : ''}
+      `}
+    >
+      <p className="text-sm text-gray-600 mb-3">
+        Drag items from your closet here to build an outfit.
+      </p>
+      <div className="flex flex-wrap gap-3 sm:gap-4">
+        {outfit.length === 0 ? (
+          <span className="text-y2k-pink/70 font-medium">Drop items here ✨</span>
+        ) : (
+          outfit.map((item) => (
+            <div key={item.id} className="w-20 sm:w-24 lg:w-28 flex-shrink-0">
+              <ItemCard
+                item={item}
+                onRemove={removeFromOutfit}
+                isInOutfit
+              />
+            </div>
+          ))
+        )}
+      </div>
+    </div>
+  )
+
   return (
     <div className="min-h-screen bg-mesh bg-[length:200%_200%] py-6 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto">
-        <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+        <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 sm:mb-8">
           <Link
             to="/"
             className="font-display text-2xl sm:text-3xl font-bold holographic-text w-fit"
@@ -120,77 +152,54 @@ export default function Closet() {
           </Link>
         </header>
 
-        {/* Outfit builder: drag items from closet here */}
-        <section className="mb-10">
-          <h2 className="font-display text-xl font-semibold text-gray-800 mb-3 flex items-center gap-2">
-            🪩 My outfit
-          </h2>
-          <div
-            onDrop={handleOutfitDrop}
-            onDragOver={handleOutfitDragOver}
-            onDragLeave={handleOutfitDragLeave}
-            className={`
-              min-h-[140px] rounded-3xl border-2 border-dashed border-y2k-pink/60
-              bg-white/40 backdrop-blur-sm p-4 sm:p-6 transition-all duration-200 touch-manipulation
-              ${outfitDropActive ? 'drag-over' : ''}
-            `}
-          >
-            <p className="text-sm text-gray-600 mb-4">
-              Drag items from your closet below to build an outfit.
-            </p>
-            <div className="flex flex-wrap gap-4">
-              {outfit.length === 0 ? (
-                <span className="text-y2k-pink/70 font-medium">Drop items here ✨</span>
-              ) : (
-                outfit.map((item) => (
-                  <div key={item.id} className="w-24 sm:w-28 flex-shrink-0">
-                    <ItemCard
-                      item={item}
-                      onRemove={removeFromOutfit}
-                      isInOutfit
-                    />
-                  </div>
-                ))
-              )}
-            </div>
-          </div>
-        </section>
-
-        <section className="mb-10 max-w-md">
+        <section className="mb-6 max-w-md">
           <AddItemForm onAdd={addItem} />
         </section>
 
-        <section className="mb-6">
-          <Filters
-            activeFilter={filter}
-            onFilterChange={setFilter}
-            activeSeasonFilter={seasonFilter}
-            onSeasonFilterChange={setSeasonFilter}
-          />
-        </section>
+        {/* Desktop: side-by-side — closet left, outfit builder right (sticky) */}
+        <div className="lg:flex lg:gap-8 lg:items-start">
+          <div className="lg:flex-1 lg:min-w-0">
+            <section className="mb-6">
+              <Filters
+                activeFilter={filter}
+                onFilterChange={setFilter}
+                activeSeasonFilter={seasonFilter}
+                onSeasonFilterChange={setSeasonFilter}
+              />
+            </section>
 
-        <section>
-          <h2 className="font-display text-xl font-semibold text-gray-800 mb-4">
-            Your closet ({filteredItems.length})
-          </h2>
-          {filteredItems.length === 0 ? (
-            <div className="rounded-3xl bg-white/50 border-2 border-dashed border-y2k-pink/40 p-12 text-center text-gray-600">
-              <p className="text-lg">No items yet. Add something to get started! 👗</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6">
-              {filteredItems.map((item) => (
-                <ItemCard
-                  key={item.id}
-                  item={item}
-                  onDragStart={() => { }}
-                  onRemoveFromCloset={removeItem}
-                  isInOutfit={outfitIds.has(item.id)}
-                />
-              ))}
-            </div>
-          )}
-        </section>
+            <section className="mb-8 lg:mb-0">
+              <h2 className="font-display text-xl font-semibold text-gray-800 mb-4">
+                Your closet ({filteredItems.length})
+              </h2>
+              {filteredItems.length === 0 ? (
+                <div className="rounded-3xl bg-white/50 border-2 border-dashed border-y2k-pink/40 p-12 text-center text-gray-600">
+                  <p className="text-lg">No items yet. Add something to get started! 👗</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+                  {filteredItems.map((item) => (
+                    <ItemCard
+                      key={item.id}
+                      item={item}
+                      onDragStart={() => { }}
+                      onRemoveFromCloset={removeItem}
+                      isInOutfit={outfitIds.has(item.id)}
+                    />
+                  ))}
+                </div>
+              )}
+            </section>
+          </div>
+
+          {/* Outfit builder: sticky on desktop, below closet on mobile */}
+          <aside className="lg:w-80 lg:flex-shrink-0 lg:sticky lg:top-6">
+            <h2 className="font-display text-xl font-semibold text-gray-800 mb-3 flex items-center gap-2">
+              🪩 My outfit
+            </h2>
+            {outfitDropZone}
+          </aside>
+        </div>
       </div>
     </div>
   )
